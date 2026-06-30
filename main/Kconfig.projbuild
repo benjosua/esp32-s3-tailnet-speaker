@@ -1,0 +1,26 @@
+menu "Tailnet Speaker"
+
+    config SPEAKER_SERVER_HOST
+        string "Tailnet server host/IP"
+        default ""
+        help
+            Tailscale 100.x IP or MagicDNS host for the controller server.
+            Leave empty to boot locally without remote control.
+
+    config SPEAKER_SERVER_PORT
+        int "Tailnet server TCP port"
+        default 5055
+        range 1 65535
+
+    config SPEAKER_DEFAULT_VOLUME
+        int "Default speaker volume"
+        default 40
+        range 0 100
+
+    config SPEAKER_ENABLE_LAN_STATUS_HTTPD
+        bool "Enable LAN HTTP status/setup page"
+        default y
+        help
+            Simple status page on the normal Wi-Fi IP. Tailnet control still uses MicroLink TCP.
+
+endmenu

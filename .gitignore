@@ -1,0 +1,17 @@
+# ESP-IDF build outputs
+build/
+sdkconfig
+sdkconfig.old
+sdkconfig.credentials
+managed_components/
+dependencies.lock
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Local/private
+*.log
+.env
+.DS_Store
