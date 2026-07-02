@@ -12,9 +12,11 @@ import argparse
 import json
 import socket
 import struct
+import subprocess
 import sys
 import threading
 import time
+import tempfile
 import wave
 from pathlib import Path
 
@@ -136,11 +138,22 @@ def generate_tone_wav(path: Path, seconds: float = 2.0, freq: float = 440.0) -> 
         wav.writeframes(frames)
 
 
+def generate_speech_wav(text: str) -> Path:
+    """Generate 24 kHz mono s16 WAV using macOS say + afconvert."""
+    tmpdir = Path(tempfile.mkdtemp(prefix="tailnet-speaker-tts-"))
+    aiff_path = tmpdir / "speech.aiff"
+    wav_path = tmpdir / "speech.wav"
+    subprocess.run(["say", "-o", str(aiff_path), text], check=True)
+    subprocess.run(["afconvert", "-f", "WAVE", "-d", "LEI16@24000", "-c", "1", str(aiff_path), str(wav_path)], check=True)
+    return wav_path
+
+
 def command_help() -> None:
     print(
         "commands:\n"
         "  status\n"
         "  led R G B\n"
+        "  speak TEXT...        (macOS say -> streamed PCM)\n"
         "  tone [seconds] [freq]\n"
         "  volume 0-100\n"
         "  alarm\n"
@@ -181,6 +194,9 @@ def repl(client_getter) -> None:
                 sec = float(parts[1]) if len(parts) > 1 else 3.0
                 freq = float(parts[2]) if len(parts) > 2 else 440.0
                 client.send_json({"cmd": "play_tone", "seconds": sec, "frequency": freq})
+            elif cmd == "speak" and len(parts) > 1:
+                wav_path = generate_speech_wav(" ".join(parts[1:]))
+                audio_stream_wav(client, wav_path)
             elif cmd == "volume" and len(parts) == 2:
                 client.send_json({"cmd": "set_volume", "volume": int(parts[1])})
             elif cmd == "alarm":

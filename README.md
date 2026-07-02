@@ -8,7 +8,7 @@ on the tailnet for remote alarms, LEDs, tones, and PCM audio playback.
 
 - ESP32-S3 native MicroLink/Tailscale-compatible client.
 - Tailnet TCP framed protocol.
-- Remote commands: status, LED color, volume, tone, PCM audio stream, alarm start/stop, schedule set.
+- Remote commands: status, LED color, volume, tone, speech/PCM audio stream, alarm start/stop, schedule set.
 - Local 24h math alarm fallback.
 - ES8311 speaker playback on Waveshare board pins.
 - WS2812 ring LEDs on GPIO38.
@@ -54,6 +54,7 @@ Interactive commands:
 ```text
 status
 led 0 0 80
+speak Good morning. This is your reminder.
 tone 3 440
 volume 45
 alarm

@@ -56,6 +56,7 @@
 #define SAMPLE_RATE 24000
 #define BLOCK_SAMPLES 256
 #define AUDIO_RING_BYTES (96 * 1024)
+#define AUDIO_STREAM_IDLE_US 2000000
 
 #define FRAME_JSON  1
 #define FRAME_AUDIO 2
@@ -341,7 +342,7 @@ static void audio_task(void *arg) {
         }
 
         if (was_streaming) {
-            if (esp_timer_get_time() - last_stream_us < 300000) {
+            if (esp_timer_get_time() - last_stream_us < AUDIO_STREAM_IDLE_US) {
                 esp_codec_dev_write(out_dev, silence, sizeof(silence));
                 continue;
             }
