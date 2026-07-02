@@ -534,7 +534,11 @@ static bool recv_exact(microlink_tcp_socket_t *sock, void *buf, size_t len, uint
     size_t got = 0;
     while (got < len) {
         int n = microlink_tcp_recv(sock, p + got, len - got, timeout_ms);
-        if (n <= 0) return false;
+        if (n < 0) return false;
+        if (n == 0) {
+            if (!microlink_tcp_is_connected(sock)) return false;
+            continue;
+        }
         got += (size_t)n;
     }
     return true;
