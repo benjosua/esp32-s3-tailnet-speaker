@@ -299,6 +299,7 @@ static void audio_task(void *arg) {
     float phase = 0.0f;
     int t = 0;
     bool was_streaming = false;
+    int64_t last_stream_us = 0;
 
     while (1) {
         if (!out_dev) {
@@ -333,12 +334,17 @@ static void audio_task(void *arg) {
                 led_mode = LED_SPEAKING;
                 send_json_event("audio_started", "{\"source\":\"stream\"}");
             }
+            last_stream_us = esp_timer_get_time();
             esp_codec_dev_write(out_dev, item, item_len);
             vRingbufferReturnItem(audio_ring, item);
             continue;
         }
 
         if (was_streaming) {
+            if (esp_timer_get_time() - last_stream_us < 300000) {
+                esp_codec_dev_write(out_dev, silence, sizeof(silence));
+                continue;
+            }
             was_streaming = false;
             led_mode = LED_IDLE;
             send_json_event("audio_stopped", "{\"source\":\"stream\"}");

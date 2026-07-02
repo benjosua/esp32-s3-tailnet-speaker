@@ -58,7 +58,10 @@ def recv_exact(sock: socket.socket, n: int) -> bytes | None:
     chunks = []
     got = 0
     while got < n:
-        part = sock.recv(n - got)
+        try:
+            part = sock.recv(n - got)
+        except OSError:
+            return None
         if not part:
             return None
         chunks.append(part)
